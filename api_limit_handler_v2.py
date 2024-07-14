@@ -61,7 +61,7 @@ def check_requests2(func):
             new_num_req = set_request(df, today_format, requests_file)
         else:
             log.warning(f"!!!!! NUMBER OF REQUESTS EXCEEDED ({num_req}) !!!!!")
-        func(*args, **kwargs)
+        return func(*args, **kwargs)
 
     return wrapper_check_req
 
@@ -89,19 +89,19 @@ def check_requests(func):
         log.info(f" === Today we made {updated_num_req} requests")
 
         # If number of requests exceeded limit, raise exception
-        if updated_num_req < 100:
+        if updated_num_req < 98:
             updated_num_req = updated_num_req + 1
             new_row = pd.DataFrame(data={"date": [today],"num_requests": [updated_num_req]})
 
             with sqlite3.connect('soccer.db') as conn:
                 new_row.to_sql(name="requests", con=conn, if_exists="replace", index=False)
 
-        # Else (more than 100 requests today), raise exception
+        # Else (more than 98 requests today), raise exception
         else:
             log.info(f" !!!!! Reached requests limit by day !!!!!")
             raise Exception("Reached requests limit by day")
 
-        func(*args, **kwargs)
+        return func(*args, **kwargs)
 
     return wrapper_check_req
 
@@ -111,6 +111,7 @@ def check_requests(func):
 def prueba(a):
     print('holi')
     print(a)
+    return "ewe"
 
 class ApiCaller():
 
