@@ -6,3 +6,7 @@ __pycache__/
 
 envapi/
 env_laliga/
+mlartifacts/
+mlruns/
+
+env_backend/

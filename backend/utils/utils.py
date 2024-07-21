@@ -2,25 +2,25 @@ import sqlite3
 import pandas as pd
 
 
-def get_team_data(team_id: int):
-    with sqlite3.connect("../db/soccer.db") as conn:
-        # Get teams data (filter by last data available before match date)
-        df = pd.read_sql(
-            f"""
-                                    SELECT team_id, query_date, name, history, total_played, wins_home, wins_away, draws_home, draws_away, loses_home, loses_away, goals_for_home, goals_for_away, goals_against_home, goals_against_away
-                                    FROM teams
-                                    WHERE teams.query_date = (
-                                        SELECT MAX(teams.query_date)
-                                        FROM teams
-                                        WHERE teams.query_date <= DATE('now')
-                                    ) AND teams.team_id = {team_id}
-                                """,
-            con=conn,
-        )
+def get_team_data(team_id: int, db):
+
+    # Get teams data (filter by last data available before match date)
+    df = pd.read_sql(
+        f"""
+            SELECT team_id, query_date, name, history, total_played, wins_home, wins_away, draws_home, draws_away, loses_home, loses_away, goals_for_home, goals_for_away, goals_against_home, goals_against_away
+            FROM teams
+            WHERE teams.query_date = (
+                SELECT MAX(teams.query_date)
+                FROM teams
+                WHERE teams.query_date <= DATE('now')
+            ) AND teams.team_id = {team_id}
+        """,
+        con=db.bind, #TODO: Review .bind method, use session instead engine
+    )
     return df
 
 
-def get_match_data(team_home_id: int, team_away_id: int):
+def get_match_data(team_home_id: int, team_away_id: int, db):
 
     df_match = pd.DataFrame.from_dict(
         {"row_1": [team_home_id, team_away_id]},
@@ -28,8 +28,8 @@ def get_match_data(team_home_id: int, team_away_id: int):
         columns=["team_home", "team_away"],
     )
 
-    df_team_home = get_team_data(team_home_id)
-    df_team_away = get_team_data(team_away_id)
+    df_team_home = get_team_data(team_home_id, db)
+    df_team_away = get_team_data(team_away_id, db)
 
     df_match = df_match.merge(
         df_team_home,
