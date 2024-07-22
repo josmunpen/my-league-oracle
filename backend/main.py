@@ -3,15 +3,25 @@ import pickle
 import pandas as pd
 from sqlalchemy.orm import Session
 
-from utils.utils import get_match_data, fe, get_team_data
-import db_models
-from  db import SessionLocal, engine
+# from utils.utils import get_match_data, fe, get_team_data
+# from utils import utils
+from .utils import utils
+from . import db_models
+from .db import SessionLocal, engine
+
+import os
 
 db_models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-loaded_model = pickle.load(open(f"./models/log_reg_v1.sav", "rb"))
-ohe_encoder = pickle.load(open(f"./models/ohe_encoder.sav", "rb"))
+print(os.listdir())
+
+loaded_model = pickle.load(open(f"backend/models/log_reg_v1.sav", "rb"))
+ohe_encoder = pickle.load(open(f"backend/models/ohe_encoder.sav", "rb"))
+
+
+# loaded_model = pickle.load(open(f"../backend/models/log_reg_v1.sav", "rb"))
+# ohe_encoder = pickle.load(open(f"../backend/models/ohe_encoder.sav", "rb"))
 
 # Create a session per request, then close
 def get_db():
@@ -29,9 +39,9 @@ async def root():
 
 @app.get("/predict")
 def predict_match(team_home_id: int, team_away_id: int, db: Session = Depends(get_db)):
-    df_match = get_match_data(team_home_id, team_away_id, db)
+    df_match = utils.get_match_data(team_home_id, team_away_id, db)
 
-    df_match = fe(df_match, ohe_encoder)
+    df_match = utils.fe(df_match, ohe_encoder)
 
     result_predict = loaded_model.predict(df_match.values)
 
@@ -40,6 +50,6 @@ def predict_match(team_home_id: int, team_away_id: int, db: Session = Depends(ge
 
 @app.get("/team")
 async def get_team(team_id:int, db: Session = Depends(get_db)):
-    res = get_team_data(team_id, db)
+    res = utils.get_team_data(team_id, db)
 
     return res.to_dict()

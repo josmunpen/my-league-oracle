@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Date, ForeignKey
 from sqlalchemy.orm import relationship
 
-from db import Base
+from .db import Base
 
 
 class Team(Base):

@@ -8,4 +8,10 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
 COPY ./backend /code/backend
 
-CMD ["fastapi", "run", "backend/main.py", "--port", "80"]
+RUN ls -la /code
+
+RUN ls -la /code/backend
+
+RUN ls -la /code/backend/models/
+
+CMD ["fastapi", "run", "backend/main.py", "--port", "8000"]
