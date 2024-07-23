@@ -140,3 +140,14 @@ def fe(df, ohe_encoder):
     df.drop(columns=cols_away_last, axis=1, inplace=True)
 
     return df
+
+def get_teams_names(db):
+    df = pd.read_sql(
+        f"""
+            SELECT team_id, name
+            FROM teams
+            GROUP BY team_id, name
+        """,
+        con=db.bind
+    )
+    return df
