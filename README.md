@@ -25,6 +25,9 @@ Data is extracted from API-FOOTBALL (https://www.api-football.com/) via RapidAPI
 - [ ] Data drift detector and model monitoring
 - [ ] MLFlow/W&B deployment
 
+### Architecture
+
+![[laliga-oracle.drawio.png]]
 
 ### Limitations
 - Koyeb returns sometimes, on the first request, a 500 Internal Server Error. In order to fix it, a new request must be done a second later.
