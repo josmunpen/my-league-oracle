@@ -24,12 +24,12 @@ app = FastAPI(
 )
 print(os.listdir())
 
-# loaded_model = pickle.load(open(f"backend/models/log_reg_v1.sav", "rb"))
-# ohe_encoder = pickle.load(open(f"backend/models/ohe_encoder.sav", "rb"))
+loaded_model = pickle.load(open(f"backend/models/log_reg_v1.sav", "rb"))
+ohe_encoder = pickle.load(open(f"backend/models/ohe_encoder.sav", "rb"))
 
 # Local
-loaded_model = pickle.load(open(f"../backend/models/log_reg_v1.sav", "rb"))
-ohe_encoder = pickle.load(open(f"../backend/models/ohe_encoder.sav", "rb"))
+# loaded_model = pickle.load(open(f"../backend/models/log_reg_v1.sav", "rb"))
+# ohe_encoder = pickle.load(open(f"../backend/models/ohe_encoder.sav", "rb"))
 
 
 # Create a session per request, then close
