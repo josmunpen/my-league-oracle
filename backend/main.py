@@ -12,13 +12,22 @@ import os
 
 db_models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(
+    title = "LaLiga Oracle",
+    description = "LaLiga Oracle is an ML based engine to predict next fixtures results.",
+    version = "0.1.0",
+    contact = {
+        "username" : "josmunpen",
+        "email": "josemamup@gmail.com"
+    }
+
+)
 print(os.listdir())
 
 loaded_model = pickle.load(open(f"backend/models/log_reg_v1.sav", "rb"))
 ohe_encoder = pickle.load(open(f"backend/models/ohe_encoder.sav", "rb"))
 
-# # Local
+# Local
 # loaded_model = pickle.load(open(f"../backend/models/log_reg_v1.sav", "rb"))
 # ohe_encoder = pickle.load(open(f"../backend/models/ohe_encoder.sav", "rb"))
 
@@ -39,6 +48,10 @@ async def root():
 
 @app.get("/predict")
 def predict_match(team_home_id: int, team_away_id: int, db: Session = Depends(get_db)):
+    """
+    Predict a fixture result.
+    """
+    
     df_match = utils.get_match_data(team_home_id, team_away_id, db)
 
     df_match = utils.fe(df_match, ohe_encoder)
@@ -54,6 +67,9 @@ def predict_match(team_home_id: int, team_away_id: int, db: Session = Depends(ge
 
 @app.get("/team")
 async def get_team(team_id: int, db: Session = Depends(get_db)):
+    """
+    Get current team info like points, number of matches played, etc.
+    """
     res = utils.get_team_data(team_id, db)
 
     return res.to_dict(orient="records")
@@ -61,6 +77,9 @@ async def get_team(team_id: int, db: Session = Depends(get_db)):
 
 @app.get("/teams_name")
 async def get_teams_names(db: Session = Depends(get_db)):
+    """
+    Get all teams names and ids associated
+    """
     res = utils.get_teams_names(db)
 
     return res.to_dict(orient="records")
