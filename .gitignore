@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
+.env
+
+envapi/
+env_laliga/
+mlartifacts/
+mlruns/
+
+env_backend/
+test/
