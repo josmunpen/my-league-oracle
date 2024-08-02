@@ -49,4 +49,7 @@ deployments:
     name: work-pool-2
     work_queue_name: null
     job_variables: {}
-  schedules: []
+  schedules:
+      - cron: "0 10 * * *"
+        timezone: "Europe/Madrid"
+        active: true
