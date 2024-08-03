@@ -1,9 +1,12 @@
-import sqlite3
 import pandas as pd
+from datetime import datetime
 
 
-def get_team_data(team_id: int, db):
+def get_team_data(team_id: int, db, request_date: datetime | None = None):
 
+    if not request_date:
+        request_date = datetime.now()
+        
     # Get teams data (filter by last data available before match date)
     df = pd.read_sql(
         f"""
@@ -12,13 +15,15 @@ def get_team_data(team_id: int, db):
             WHERE teams.query_date = (
                 SELECT MAX(teams.query_date)
                 FROM teams
-                WHERE teams.query_date <= DATE('now')
+                WHERE teams.query_date <= DATE('{request_date}')
+                  AND teams.team_id = {team_id}
             ) AND teams.team_id = {team_id}
         """,
         con=db.bind, #TODO: Review .bind method, use session instead engine
     )
     return df
 
+                # WHERE teams.query_date <= DATE('now')
 
 def get_match_data(team_home_id: int, team_away_id: int, db):
 
@@ -58,7 +63,6 @@ def get_match_data(team_home_id: int, team_away_id: int, db):
     ]
 
     return df_match
-
 
 def fe(df, ohe_encoder):
     # Drop columns
