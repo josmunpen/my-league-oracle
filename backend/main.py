@@ -2,17 +2,31 @@ from fastapi import FastAPI, Depends
 import pickle
 import pandas as pd
 from sqlalchemy.orm import Session
+from contextlib import asynccontextmanager
 
-from .utils import utils
 from . import db_models
-from .db import SessionLocal, engine
-
-import sklearn
-import os
+from .db import engine
+from .routers import teams, predictions
+from .models import classifier
+import mlflow.sklearn
+import dagshub
 
 db_models.Base.metadata.create_all(bind=engine)
 
+mlflow.set_tracking_uri("https://dagshub.com/josmunpen/laliga-oracle-dags.mlflow")
+dagshub.init(repo_owner='josmunpen', repo_name='laliga-oracle-dags', mlflow=True)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+
+    classifier.model = mlflow.sklearn.load_model("models:/log_reg_def/1")
+    classifier.ohe = mlflow.sklearn.load_model("models:/ohe/1")
+    yield
+
+    classifier.clear()
+
 app = FastAPI(
+    lifespan=lifespan,
     title = "LaLiga Oracle",
     description = "LaLiga Oracle is an ML based engine to predict next fixtures results.",
     version = "0.1.0",
@@ -22,64 +36,10 @@ app = FastAPI(
     }
 
 )
-print(os.listdir())
 
-loaded_model = pickle.load(open(f"backend/models/log_reg_v1.sav", "rb"))
-ohe_encoder = pickle.load(open(f"backend/models/ohe_encoder.sav", "rb"))
+app.include_router(teams.router)
+app.include_router(predictions.router)
 
-# Local
-# loaded_model = pickle.load(open(f"../backend/models/log_reg_v1.sav", "rb"))
-# ohe_encoder = pickle.load(open(f"../backend/models/ohe_encoder.sav", "rb"))
-
-
-# Create a session per request, then close
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-@app.get("/")
+@app.get("/health")
 async def root():
-    return {"message": "Hola mundo! :)"}
-
-
-@app.get("/predict")
-def predict_match(team_home_id: int, team_away_id: int, db: Session = Depends(get_db)):
-    """
-    Predict a fixture result.
-    """
-    
-    df_match = utils.get_match_data(team_home_id, team_away_id, db)
-
-    df_match = utils.fe(df_match, ohe_encoder)
-
-    result_predict = loaded_model.predict(df_match.values)[0]
-    probs = loaded_model.predict_proba(df_match.values)[0]
-
-    return {
-        "result_prediction": int(result_predict),
-        "probs": {"home_win": probs[0], "draw": probs[1], "away_win": probs[2]},
-    }
-
-
-@app.get("/team")
-async def get_team(team_id: int, db: Session = Depends(get_db)):
-    """
-    Get current team info like points, number of matches played, etc.
-    """
-    res = utils.get_team_data(team_id, db)
-
-    return res.to_dict(orient="records")
-
-
-@app.get("/teams_name")
-async def get_teams_names(db: Session = Depends(get_db)):
-    """
-    Get all teams names and ids associated
-    """
-    res = utils.get_teams_names(db)
-
-    return res.to_dict(orient="records")
+    return {"message": "Everything looks ok 😁👌"}
