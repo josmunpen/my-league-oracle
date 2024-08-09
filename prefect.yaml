@@ -1,52 +1,31 @@
-# Welcome to your prefect.yaml file! You can use this file for storing and managing
-# configuration for deploying your flows. We recommend committing this file to source
-# control along with your flow code.
-
 # Generic metadata about this project
 name: orchestration
 prefect-version: 2.19.9
 
-# build section allows you to manage and build docker images
-build: null
+build:
 
-# push section allows you to manage if and how this project is uploaded to remote locations
-push: null
+push:
 
-# pull section allows you to provide instructions for cloning this project in remote locations
 pull:
-  - prefect.deployments.steps.git_clone:
-      id: clone-step
-      repository: https://github.com/josmunpen/laliga-oracle.git
-      branch: prefect-aux
-  # - prefect.deployments.steps.pip_install_requirements:
-  #     directory: ./
-  #     requirements_file: requirements.txt
+- prefect.deployments.steps.git_clone:
+    id: clone-step
+    repository: https://github.com/josmunpen/laliga-oracle.git
+    branch: main
 
 
-
-# the deployments section allows you to provide configuration for deploying flows
 deployments:
-- name: deploy_test_db
-  version: null
-  tags: []
-  description: null
-  entrypoint: orchestration\test_api.py:get_db_data
-  parameters: {}
-  work_pool:
-    name: work-pool-2
-    work_queue_name: null
-    job_variables: {
-      "pip_packages": ["pandas"]
-    }
-  schedules: []
 - name: deploy_populate_historic
-  version: null
+  version:
   tags: []
-  description: null
+  description:
   entrypoint: orchestration\populate_historic_data.py:populate_teams_data
   parameters: {}
   work_pool:
     name: work-pool-2
-    work_queue_name: null
+    work_queue_name:
     job_variables: {}
-  schedules: []
+  schedules:
+  - cron: 0 10 * * *
+    timezone: Europe/Madrid
+    day_or: true
+    active: true
