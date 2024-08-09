@@ -99,10 +99,12 @@ def populate_teams_data():
     teams_id = get_teams_ids(headers, year=2023)
 
     teams = {}
-    for team_id in teams_id:
+    for team_id in teams_id[:2]:
         team_data = {}
         for query_date in wednesdays[:2]:
-            data_retrieved = teams_db[(teams_db["team_id"]==team_id) & (teams_db["query_date"]==str(query_date))]
+
+            data_retrieved = teams_db[(teams_db["team_id"]==team_id) & (teams_db["query_date"]==query_date)]
+
             # If data is not available at db, get it
             if data_retrieved.empty:
                 logger.info(f"Data needed for team {team_id} and query date {query_date}")
@@ -113,5 +115,5 @@ def populate_teams_data():
     # Persist teams data
     persist_teams(db, teams)
 
-# if __name__ == "__main__":
-#     populate_teams_data()
+if __name__ == "__main__":
+    populate_teams_data()
