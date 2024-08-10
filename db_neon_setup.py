@@ -4,8 +4,8 @@ import sqlite3
 import logging
 import argparse
 
-from db import engine
-import db_models
+from backend.db import engine
+from backend import db_models
 
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG, format='%(message)s')
@@ -47,14 +47,14 @@ def db_setup(to_populate, to_export, to_remove=False):
 
 def populate_table(db, table, year=2022):
     log.info(f"Populating table {table} with {year} data")
-    df = pd.read_csv(f"../exports/{year}_{table}.csv")
+    df = pd.read_csv(f"./exports/{year}_{table}.csv")
     df.to_sql(table, db.bind, if_exists="append", index=False)
 
 def export_db(table, year=2022):
     log.info(f"Exporting data with {year} data")
     with sqlite3.connect('../db/soccer.db') as conn:
         df = pd.read_sql(f'select * from {table}', conn)
-    df.to_csv(f"../exports/{year}_{table}.csv", index=False)
+    df.to_csv(f"./exports/{year}_{table}.csv", index=False)
 
 if __name__ == '__main__':
 

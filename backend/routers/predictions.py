@@ -24,9 +24,7 @@ def predict_match(team_home_id: int, team_away_id: int, db: Session = Depends(ge
     """
     Predict a fixture result.
     """
-    
     df_match = utils.get_match_data(team_home_id, team_away_id, db)
-
     df_match = utils.fe(df_match, classifier.ohe)
 
     result_predict = classifier.model.predict(df_match.values)[0]

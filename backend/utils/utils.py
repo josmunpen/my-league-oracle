@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 import pandas as pd
 from datetime import datetime
 
@@ -65,10 +66,20 @@ def get_match_data(team_home_id: int, team_away_id: int, db):
     return df_match
 
 def fe(df, ohe_encoder):
+    
+    #TODO: Review
+    if df.shape[0] > 0:
+        df = df.head(1)
+
     # Drop columns
     df = df.drop(
         columns=["home_query_date", "away_query_date", "home_name", "away_name"], axis=1
     )
+
+    # If any value is null, raise exception
+    if df.isnull().any().any():
+        raise HTTPException(status_code=500,
+                            detail="Wrong data retrieved");
 
     # OHE
     ohe_cols = ["team_home", "team_away"]
