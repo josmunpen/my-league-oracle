@@ -19,6 +19,7 @@ def get_team_data(team_id: int, db, request_date: datetime | None = None):
                 WHERE teams.query_date <= DATE('{request_date}')
                   AND teams.team_id = {team_id}
             ) AND teams.team_id = {team_id}
+            AND teams.history IS NOT NULL
         """,
         con=db.bind, #TODO: Review .bind method, use session instead engine
     )
