@@ -3,7 +3,6 @@ import datetime
 from functools import wraps
 import requests
 import json
-from prefect import flow, get_run_logger, task
 from prefect_sqlalchemy import DatabaseCredentials
 
 
@@ -100,13 +99,13 @@ def get_team_info(headers, team_id, season, query_date):
         goals_against_away,
     )
 
-def get_all_wednesdays(year):
+def get_all_wednesdays(season: int):
     """
-    Get all wednesdays of a year
+    Get all wednesdays of a season
     """
 
-    first_match_date = datetime.date(year,8,1)
-    last_match_date =  datetime.date(year+1,6,30)
+    first_match_date = datetime.date(season,8,1)
+    last_match_date =  datetime.date(season+1,6,30)
 
     diff_to_wednesday = (7 - 5 - first_match_date.weekday()) % 7
 
@@ -123,3 +122,16 @@ def get_all_wednesdays(year):
     
     return wednesdays
 
+def check_run_date(season:int, run_date: datetime):
+    """
+    Check if a run date is in date range.
+    """
+
+    first_match_date = datetime.date(season,8,1)
+    last_match_date =  datetime.date(season+1,6,30)
+
+
+    if first_match_date < run_date.date() < last_match_date:
+        return True
+    else:
+        raise Exception("Run date is out of range.") 
