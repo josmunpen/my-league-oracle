@@ -12,3 +12,9 @@ mlruns/
 env_backend/
 test/
 env_dagss/
+
+front/.web
+front/__pycache__/
+front/prueba/
+front/env_front/
+front/assets/external/
