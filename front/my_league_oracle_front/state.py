@@ -51,9 +51,10 @@ class State(rx.State):
         # Get form data
         self.form_team_details = form_team_details
 
-        input_id = form_team_details["input_details_team_id"]
+        input_name = form_team_details["input_details_team_name"]
         input_date = form_team_details["input_details_request_date"]
 
+        input_id = self.data_teams[self.data_teams["Name"]==input_name]["Team ID"].tolist()[0]
 
         # API call to retrieve team details
         url = f"{backend_url}/teams/{input_id}?request_date={input_date}"
@@ -86,14 +87,11 @@ class State(rx.State):
         )
         df.rename({0: "Value"}, axis=1, inplace=True)
         df["Field"] = df.index
-        df.columns = ["Field", "Value"]
 
-        self.team_details = df
+        df.columns = [["Value", "Field"]]
 
-        dict_team_details = json.loads(response.text)[0]
-        dict_team_details = { rename_cols[key]: val for key, val in dict_team_details.items() if key in rename_cols.keys()}
-
-        self.team_details2 = dict_team_details
+        self.team_details = df[["Field", "Value"]]
+        self.team_details2 = [list(x) for x in df[["Field", "Value"]].to_numpy()]
         
 
     # Oracle (predictions) state
@@ -111,6 +109,9 @@ class State(rx.State):
     team_home_id: str = None
     team_away_id: str = None
 
+    ## Show when prediction is done
+    show_prediction: bool = False
+
     def format_prediction(self, prediction) -> str:
         '''
         Returns name of winner team or Draw.
@@ -118,10 +119,13 @@ class State(rx.State):
         res = None
         if prediction == 0:
             res = self.form_oracle["team_home"]
+            res = "🏆 " + res + " winner 🏆" 
         if prediction == 1:
             res = "Draw"
+            res = "✖️ " + res + " ✖️"
         if prediction == 2:
-            res = self.form_oracle["team_away"]            
+            res = self.form_oracle["team_away"]
+            res = "🏆 " + res + " winner 🏆" 
         return res
     
     def handle_submit_oracle(self, form_oracle: dict):
@@ -151,4 +155,5 @@ class State(rx.State):
                 {"name": "Draw", "prob": res_prediction["probs"]["draw"]},
                 {"name": "Win away", "prob": res_prediction["probs"]["away_win"]}
             ]
+        self.show_prediction = True
     

@@ -76,7 +76,7 @@ def index() -> rx.Component:
     # Welcome Page (Index)
     child = rx.container(
         rx.vstack(
-            rx.heading("Welcome to laliga-oracle!", size="9"),
+            rx.heading("Welcome to My League Oracle!", size="9"),
             rx.text(
                 "Your favourite AI based predictions app.",
                 size="5",
