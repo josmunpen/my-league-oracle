@@ -9,7 +9,7 @@ push:
 pull:
 - prefect.deployments.steps.git_clone:
     id: clone-step
-    repository: https://github.com/josmunpen/laliga-oracle.git
+    repository: https://github.com/josmunpen/my-league-oracle.git
     branch: main
 
 
