@@ -17,7 +17,7 @@ def about_page() -> rx.Component:
             </div>
             """
                     ),
-                    rx.image(src="https://github.com/user-attachments/assets/913d26b4-8f95-431e-9029-3c32820cf3db",
+                    rx.image(src="https://github.com/user-attachments/assets/1f41135d-7ae7-4ab6-8346-1c6becfabd9b",
                              width="30%"),
                     rx.markdown(
             """
@@ -48,7 +48,7 @@ def about_page() -> rx.Component:
 
             Following image shows a kind of simplified architecture diagram
 
-            ![laliga-oracle drawio (2)](https://github.com/user-attachments/assets/572e3f05-6488-4495-adaa-bb392342ce97)
+            ![myleagueoracle](https://github.com/user-attachments/assets/8d1c1c33-15a7-49e6-b20d-c820ea6c1d1f)
 
             CI/CD is configured to automatically publish new Prefect flows when they're pushed to Git main branch. Backend code is also automatically pushed to Koyeb when a Pull Request is commited to main branch. If this deployment fails, it automatically rollbacks to last stable version. 
 
