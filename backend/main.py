@@ -23,7 +23,8 @@ async def lifespan(app: FastAPI):
     classifier.ohe = mlflow.sklearn.load_model("models:/ohe/1")
     yield
 
-    classifier.clear()
+    #TODO
+    #classifier.clear()
 
 app = FastAPI(
     lifespan=lifespan,
