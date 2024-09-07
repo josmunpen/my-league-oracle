@@ -25,7 +25,23 @@ deployments:
     work_queue_name:
     job_variables: {}
   schedules:
-  - cron: 0 10 * * *
+  - cron: 0 10 * * * # Everyday at 10:00
+    timezone: Europe/Madrid
+    day_or: true
+    active: true
+
+- name: deploy_populate_new
+  version:
+  tags: []
+  description:
+  entrypoint: orchestration\populate_new_data.py:populate_new_data
+  parameters: {}
+  work_pool:
+    name: work-pool-2
+    work_queue_name:
+    job_variables: {}
+  schedules:
+  - cron: 0 9 * * 3 # Every wednesday
     timezone: Europe/Madrid
     day_or: true
     active: true

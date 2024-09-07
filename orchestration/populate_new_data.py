@@ -53,7 +53,7 @@ def populate_new_data(season, run_date):
     teams_id = populate_tasks.get_teams_ids(headers, season=season)
 
     teams = {}
-    for team_id in teams_id[:2]:
+    for team_id in teams_id:
         team_data = {}
 
         data_retrieved = teams_db[(teams_db["team_id"]==team_id)]
