@@ -1,17 +1,18 @@
 # laliga-oracle
 
 <p align="center" width="100%">
-    <img width="30%" src="https://github.com/user-attachments/assets/913d26b4-8f95-431e-9029-3c32820cf3db">
+    <img width="30%" src="https://github.com/user-attachments/assets/1f41135d-7ae7-4ab6-8346-1c6becfabd9b">
 </p>
 
-LaLiga Oracle is a prediction system for LaLiga results based on Machine Learning. It was born as a personal project with the goal of implementing MLOps techniques and tools. 
+MyLeagueOracle is a prediction system for your favourite league results based on Machine Learning. It was born as a personal project with the goal of implementing MLOps techniques and tools. 
 
 I have tried to use as many free cloud providers as possible, reaching in some cases certain limitations listed in the [Limitations](#limitations) section.
 
 Data is extracted from API-FOOTBALL (https://www.api-football.com/) via RapidAPI. Prefect is responsible for making periodic calls to extract the necessary data. Currently it only inserts into PostgreSQL, but it is expected that in the future it will be responsible for retraining and generating new ML models. FastAPI is the backend used to make the PostgreSQL data available and to perform the predictions. Currently we have opted for online inference instead of batch, but this strategy could be changed in the future.
 
 ### Architecture
-![laliga-oracle drawio (2)](https://github.com/user-attachments/assets/572e3f05-6488-4495-adaa-bb392342ce97)
+![myleagueoracle-arch](https://github.com/user-attachments/assets/8d1c1c33-15a7-49e6-b20d-c820ea6c1d1f)
+
 
 ### Roadmap
 - [x] Sample data retrieval
