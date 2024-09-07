@@ -3,23 +3,23 @@ from ..ui.base import base_page
 
 
 def about_page() -> rx.Component:
-    child = rx.box(
-        
-        rx.center(
-            rx.container(
-                rx.vstack(
-                    rx.markdown(
-            """
-            <div style="text-align: justify">
+    child = rx.hstack(
+        rx.spacer(bg=rx.color("gray", 2)),
 
-            # MyLeagueOracle
-            
-            </div>
+        rx.vstack(
+            rx.heading(
             """
-                    ),
-                    rx.image(src="https://github.com/user-attachments/assets/1f41135d-7ae7-4ab6-8346-1c6becfabd9b",
-                             width="30%"),
-                    rx.markdown(
+            My League Oracle
+
+            
+            """,
+                size="7"
+            ),
+            rx.image(
+                src="https://github.com/user-attachments/assets/1f41135d-7ae7-4ab6-8346-1c6becfabd9b",
+                width="30%",
+            ),
+            rx.markdown(
             """
             <div style="text-align: justify">
 
@@ -30,16 +30,16 @@ def about_page() -> rx.Component:
 
             </div>
             """
-                    ),
-                    rx.blockquote(
-                        rx.markdown(
-            """
+            ),
+            rx.blockquote(
+                rx.markdown(
+                    """
             The focus is on the deployment of the various components and the connectivity between them, as well as the CI/CD cycles. This is **not** a project to develop the ML model with best metrics. I have tried to keep things simple in that regard.
             """
-                        ),
-                    ),
-                    rx.markdown(
-            """
+                ),
+            ),
+            rx.markdown(
+                """
             
             <div style="text-align: justify">
             Since I usually find weaknesses on these kind of tasks on data scienctist profiles, I decided to learn current best practices and (maybe) this will help somebody to start his/her journey
@@ -56,23 +56,27 @@ def about_page() -> rx.Component:
             
             </div>
 
-            """),
-                    rx.blockquote(
-                    """
+            """
+            ),
+            rx.blockquote(
+                """
                         Right now, I push manually ML models to MLFlow. Next step: this will be automated and Prefect will push the best model every week.
-                    """),
-                    rx.blockquote(
                     """
+            ),
+            rx.blockquote(
+                """
 
                         Currently I have opted for online inference instead of batch, but this strategy could be changed in the future.
 
-                    """),
-                    rx.blockquote(
                     """
+            ),
+            rx.blockquote(
+                """
                         I have tried to use as many free cloud providers as possible, reaching in some cases certain limitations listed in the next section.
-                    """),
-                    rx.markdown(
-            """
+                    """
+            ),
+            rx.markdown(
+                """
 
             <div style="text-align: justify">
             
@@ -93,17 +97,15 @@ def about_page() -> rx.Component:
 
             </div>
             """
-            )
-                , 
-                align="center",
-                justify="center"
-                ),
-            width="30%",
-            background_color="white",
-
-            )
+            ),
+            width="100%",
+            max_width="80em",
+            margin="0 auto",
+            padding="1em",
+            align="center"
         ),
-    width="100%",
-    background_color=rx.color("gray", 2),
+        rx.spacer(bg=rx.color("gray", 2)),
+        width="100%",
+        #height="500vh",
     )
     return base_page(child)
