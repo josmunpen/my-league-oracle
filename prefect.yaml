@@ -19,7 +19,9 @@ deployments:
   tags: []
   description:
   entrypoint: orchestration\populate_historic_data.py:populate_teams_data
-  parameters: {}
+  parameters: {
+    "season": 2022
+  }
   work_pool:
     name: work-pool-2
     work_queue_name:
@@ -35,7 +37,10 @@ deployments:
   tags: []
   description:
   entrypoint: orchestration\populate_new_data.py:populate_new_data
-  parameters: {}
+  parameters: {
+    "season": 2024,
+    "run_date": "today"
+  }
   work_pool:
     name: work-pool-2
     work_queue_name:

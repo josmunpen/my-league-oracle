@@ -43,6 +43,8 @@ def populate_new_data(season, run_date):
     
     db = DatabaseCredentials.load("neon-postgre-credentials").get_engine()
 
+    run_date = datetime.today() if run_date=="today" else datetime.strptime(run_date, "%Y-%m-%d")
+
     # Get current db data
     teams_db = get_loaded_teams(db, run_date=run_date)
 
@@ -69,5 +71,5 @@ def populate_new_data(season, run_date):
     # Persist teams data
     populate_tasks.persist_teams(db, teams)
 
-#if __name__ == "__main__":
-#    populate_new_data(season=2024, run_date=datetime.today())
+# if __name__ == "__main__":
+#    populate_new_data(season=2024, run_date="today")

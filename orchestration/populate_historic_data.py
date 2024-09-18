@@ -25,7 +25,7 @@ def get_loaded_teams(db):
 
 
 @flow(log_prints=True)
-def populate_teams_data(season):
+def populate_teams_data(season=2022):
     logger = get_run_logger()
 
     logger.info("🚀 Starting flow")
@@ -63,5 +63,5 @@ def populate_teams_data(season):
     # Persist teams data
     populate_tasks.persist_teams(db, teams)
 
-#if __name__ == "__main__":
+# if __name__ == "__main__":
 #    populate_teams_data(season=2022)
