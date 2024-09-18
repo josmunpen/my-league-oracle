@@ -36,12 +36,12 @@ def navbar() -> rx.Component:
             rx.hstack(
                 rx.hstack(
                     rx.image(
-                        src="league-oracle.png",
+                        src="/league-oracle.png",
                         width="2em",
                         height="auto",
                         border_radius="25%",
                     ),
-                    rx.heading("Reflex", size="6", weight="bold"),
+                    rx.heading("My League Oracle", size="6", weight="bold"),
                     align_items="center",
                 ),
                 rx.menu.root(

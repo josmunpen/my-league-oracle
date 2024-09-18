@@ -7,14 +7,14 @@ def about_page() -> rx.Component:
         rx.spacer(bg=rx.color("gray", 2)),
 
         rx.vstack(
-            rx.heading(
-            """
-            My League Oracle
+        #     rx.heading(
+        #     """
+        #     My League Oracle
 
             
-            """,
-                size="7"
-            ),
+        #     """,
+        #         size="7"
+        #     ),
             rx.image(
                 src="https://github.com/user-attachments/assets/1f41135d-7ae7-4ab6-8346-1c6becfabd9b",
                 width="30%",
