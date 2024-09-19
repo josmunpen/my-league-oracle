@@ -59,11 +59,12 @@ def get_match_data(team_home_id: int, team_away_id: int, db):
         suffixes=(None, "_index_away"),
     )
     df_match.drop(columns=["team_id"], axis=1, inplace=True)
+
     df_match.columns = [
         "away_" + col if ((col in df_team_away.columns) and (col != "id")) else col
         for col in df_match.columns
     ]
-
+    
     return df_match
 
 def fe(df, ohe_encoder):
@@ -84,54 +85,21 @@ def fe(df, ohe_encoder):
 
     # OHE
     ohe_cols = ["team_home", "team_away"]
-    ohe_encoded = ohe_encoder.transform(df[ohe_cols])
+    try:
+        ohe_encoded = ohe_encoder.transform(df[ohe_cols])
+    except ValueError:
+        raise HTTPException(204, "Data not found. Please note that newly promoted teams could address some issues.")
     df = pd.concat([df, ohe_encoded], axis=1).drop(columns=ohe_cols)
 
-    # History
+    # History feature
+    # Get last 6 matches
     df["home_history"] = df["home_history"].apply(lambda x: list(x)[:6])
     df["away_history"] = df["away_history"].apply(lambda x: list(x)[:6])
-    df[
-        [
-            "home_last_1",
-            "home_last_2",
-            "home_last_3",
-            "home_last_4",
-            "home_last_5",
-            "home_last_6",
-        ]
-    ] = df["home_history"].apply(pd.Series)
 
-    df[
-        [
-            "away_last_1",
-            "away_last_2",
-            "away_last_3",
-            "away_last_4",
-            "away_last_5",
-            "away_last_6",
-        ]
-    ] = df["away_history"].apply(pd.Series)
+    # If data retrieved is smaller than 6, get as matches as possible
+    len_home_history = len(df["home_history"].iloc[0])
+    len_away_history = len(df["away_history"].iloc[0])
 
-    df.drop(["home_history", "away_history"], axis=1, inplace=True)
-
-    label_cols = [
-        "home_last_1",
-        "home_last_2",
-        "home_last_3",
-        "home_last_4",
-        "home_last_5",
-        "home_last_6",
-        "away_last_1",
-        "away_last_2",
-        "away_last_3",
-        "away_last_4",
-        "away_last_5",
-        "away_last_6",
-    ]
-
-    df.replace({"L": 0, "D": 1, "W": 2}, inplace=True)
-
-    # History feature
     cols_home_last = [
         "home_last_1",
         "home_last_2",
@@ -139,7 +107,8 @@ def fe(df, ohe_encoder):
         "home_last_4",
         "home_last_5",
         "home_last_6",
-    ]
+    ][:len_home_history]
+
     cols_away_last = [
         "away_last_1",
         "away_last_2",
@@ -147,11 +116,22 @@ def fe(df, ohe_encoder):
         "away_last_4",
         "away_last_5",
         "away_last_6",
-    ]
+    ][:len_away_history]
 
+    # Create one column per match
+    df[cols_home_last] = df["home_history"].apply(pd.Series)
+    df[cols_away_last] = df["away_history"].apply(pd.Series)
+
+    df.drop(["home_history", "away_history"], axis=1, inplace=True)
+
+    # Replace values
+    df.replace({"L": 0, "D": 1, "W": 2}, inplace=True)
+
+    # Get mean
     df["home_last_avg"] = df[cols_home_last].mean(axis=1, skipna=True)
     df["away_last_avg"] = df[cols_away_last].mean(axis=1, skipna=True)
 
+    # Drop extra columns
     df.drop(columns=cols_home_last, axis=1, inplace=True)
     df.drop(columns=cols_away_last, axis=1, inplace=True)
 
