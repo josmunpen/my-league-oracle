@@ -2,10 +2,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-.env
 
-envapi/
-env_laliga/
 mlartifacts/
 mlruns/
 
@@ -18,6 +15,14 @@ front/__pycache__/
 front/prueba/
 front/env_front/
 front/assets/external/
+
+
+
+.env
+envapi/
+env_laliga/
 env_front/
 env_back/
 env_orch/
+env_orch2/
+env_train/

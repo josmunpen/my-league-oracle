@@ -20,7 +20,7 @@ deployments:
   description:
   entrypoint: orchestration\populate_historic_data.py:populate_teams_data
   parameters: {
-    "season": 2022
+    "season": 2023
   }
   work_pool:
     name: work-pool-2
@@ -46,7 +46,25 @@ deployments:
     work_queue_name:
     job_variables: {}
   schedules:
-  - cron: 0 9 * * 3 # Every wednesday
+  - cron: 0 9 * * 3 # Every Wednesday
+    timezone: Europe/Madrid
+    day_or: true
+    active: true
+
+- name: deploy_populate_new_matches
+  version:
+  tags: []
+  description:
+  entrypoint: orchestration\populate_historic_matches.py:populate_matches_data
+  parameters: {
+    "season": 2024
+  }
+  work_pool:
+    name: work-pool-2
+    work_queue_name:
+    job_variables: {}
+  schedules:
+  - cron: 0 9 * * 2 # Every Tuesday
     timezone: Europe/Madrid
     day_or: true
     active: true

@@ -4,6 +4,8 @@ import requests
 import json
 import pandas as pd
 
+from sqlalchemy import text
+
 
 @task
 def get_teams_ids(headers: dict, season: int):
@@ -58,5 +60,35 @@ def persist_teams(db, teams):
             df_teams.to_sql(name="teams", con=conn, if_exists="append", index=False)
 
     logger.info(f"✅ Persisted {df_teams.shape[0]} teams sucessfully")
+
+    return True
+
+
+@task
+def persist_matches(db, season, matches):
+    """
+    Persist a list of matches data
+    """
+    logger = get_run_logger()
+
+    matches["season"] = season
+    matches["match_date"] = pd.to_datetime(matches["match_date"]).dt.strftime("%Y-%m-%d")
+
+    with db.connect() as conn:
+
+        # Drop last matches version
+        conn.execute(text("""
+                          DELETE
+                          FROM matches
+                          WHERE season=:season
+                          """), {"season": season})
+        
+        conn.commit()
+
+        # Insert new matches version
+        matches.to_sql(name="matches", con=conn, if_exists="append", index=False)
+
+    
+    logger.info(f"✅ Persisted {matches.shape[0]} matches sucessfully")
 
     return True

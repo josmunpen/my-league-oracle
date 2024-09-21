@@ -1,7 +1,4 @@
-from fastapi import FastAPI, Depends
-import pickle
-import pandas as pd
-from sqlalchemy.orm import Session
+from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
 from . import db_models

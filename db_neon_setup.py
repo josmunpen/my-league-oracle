@@ -29,7 +29,9 @@ def db_setup(to_populate, to_export, to_remove=False):
         except Exception as e:
             log.warn('Unable to create tables', repr(e))
 
+
     # Create tables
+    log.info("Creating all tables")
     db_models.Base.metadata.create_all(engine)
 
     # Populate tables

@@ -23,6 +23,7 @@ class Team(Base):
     goals_for_away = Column(Integer)
     goals_against_home = Column(Integer)
     goals_against_away = Column(Integer)
+    season = Column(Integer)
 
 
 
@@ -36,6 +37,7 @@ class Match(Base):
     team_away = Column(Integer)
     result_predict = Column(String)
     result_real = Column(String)
+    season = Column(Integer)
 
     # TODO: Review FK
     # team_home = relationship("team_home", foreign_keys="Team.team_id")
@@ -46,6 +48,6 @@ class Match(Base):
 class Request(Base):
     __tablename__ = "requests"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     date = Column(Date)
     num_requests = Column(Integer)
