@@ -40,6 +40,7 @@ def populate_matches_data(season):
             data_fixtures.extend(round_data)
     except NumRequestException as e:
         print(e)
+        raise
     except Exception as e:
         print("Oooops, something bad happened.")
         raise
@@ -51,5 +52,5 @@ def populate_matches_data(season):
     # Persist teams data
     populate_tasks.persist_matches(db, season, df_fixtures)
 
-# if __name__ == "__main__":
-#    populate_matches_data(season=2024)
+if __name__ == "__main__":
+   populate_matches_data(season=2024)

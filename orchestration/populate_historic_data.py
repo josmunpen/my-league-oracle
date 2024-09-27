@@ -8,6 +8,8 @@ import time
 
 import populate_tasks
 
+from utils import NumRequestException
+
 @task
 def get_loaded_teams(db):
     """
@@ -50,18 +52,24 @@ def populate_teams_data(season=2022):
     for team_id in teams_id:
         team_data = {}
         for query_date in wednesdays:
-
             data_retrieved = teams_db[(teams_db["team_id"]==team_id) & (teams_db["query_date"]==query_date)]
             #TODO: Concat everything to a single dataframe
             # If data is not available at db, get it
             if data_retrieved.empty:
-                logger.info(f"Data not found for team {team_id} and query date {query_date}")
-                team_data[query_date] = utils.get_team_info(headers=headers, team_id=team_id, season=season, query_date=query_date)
-                time.sleep(5) #TODO: less time ?
+                try:    
+                    logger.info(f"Data not found for team {team_id} and query date {query_date}")
+                    team_data[query_date] = utils.get_team_info(headers=headers, team_id=team_id, season=season, query_date=query_date)
+                    time.sleep(5) #TODO: less time ?
+                except NumRequestException as e:
+                    print(e)
+                    break
+                except Exception as e:
+                    print("Oooops, something bad happened.")
+                    raise
         teams[team_id] = team_data
 
     # Persist teams data
     populate_tasks.persist_teams(db, teams)
 
-# if __name__ == "__main__":
-#    populate_teams_data(season=2022)
+if __name__ == "__main__":
+   populate_teams_data(season=2022)
