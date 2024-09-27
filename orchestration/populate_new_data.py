@@ -79,5 +79,5 @@ def populate_new_data(season, run_date):
     # Persist teams data
     populate_tasks.persist_teams(db, teams)
 
-if __name__ == "__main__":
-   populate_new_data(season=2024, run_date="today")
+# if __name__ == "__main__":
+#    populate_new_data(season=2024, run_date="today")

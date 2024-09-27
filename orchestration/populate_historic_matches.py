@@ -52,5 +52,5 @@ def populate_matches_data(season):
     # Persist teams data
     populate_tasks.persist_matches(db, season, df_fixtures)
 
-if __name__ == "__main__":
-   populate_matches_data(season=2024)
+# if __name__ == "__main__":
+#    populate_matches_data(season=2024)
