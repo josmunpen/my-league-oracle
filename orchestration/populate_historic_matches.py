@@ -10,6 +10,8 @@ import json
 
 import populate_tasks
 
+from utils import NumRequestException
+
 
 
 @flow(log_prints=True)
@@ -32,14 +34,23 @@ def populate_matches_data(season):
 
     data_fixtures = []
 
-    for round in rounds:
-        round_data = utils.get_round_info(round=round, headers=headers, season=season)
-        data_fixtures.extend(round_data)
+    try:
+        for round in rounds:
+            round_data = utils.get_round_info(round=round, headers=headers, season=season)
+            data_fixtures.extend(round_data)
+    except NumRequestException as e:
+        print(e)
+        raise
+    except Exception as e:
+        print("Oooops, something bad happened.")
+        raise
+
+
 
     df_fixtures = pd.DataFrame(data_fixtures, columns=["fixture", "match_date", "team_home", "team_away", "result_predict", "result_real"])
 
     # Persist teams data
     populate_tasks.persist_matches(db, season, df_fixtures)
 
-# if __name__ == "__main__":
+# if __name__ == "__main__": 
 #    populate_matches_data(season=2024)

@@ -12,6 +12,8 @@ import time
 
 import populate_tasks
 
+from utils import NumRequestException
+
 @task
 def get_loaded_teams(db, run_date):
     """
@@ -63,9 +65,15 @@ def populate_new_data(season, run_date):
 
         # If data is not available at db, get it
         if data_retrieved.empty:
-            logger.info(f"Data not found for team {team_id} and run date {run_date}")
-            team_data[run_date] = utils.get_team_info(headers=headers, team_id=team_id, season=season, query_date=run_date.strftime("%Y-%m-%d"))
-            time.sleep(5) #TODO: less time ?
+            try:
+                logger.info(f"Data not found for team {team_id} and run date {run_date}")
+                team_data[run_date] = utils.get_team_info(headers=headers, team_id=team_id, season=season, query_date=run_date.strftime("%Y-%m-%d"))
+                time.sleep(5) #TODO: less time ?
+            except NumRequestException as e:
+                print(e)
+            except Exception as e:
+                print("Oooops, something bad happened.")
+                raise
         teams[team_id] = team_data
 
     # Persist teams data
