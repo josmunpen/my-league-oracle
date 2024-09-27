@@ -9,6 +9,10 @@ import time
 from sqlalchemy.types import String, Integer, Date
 from sqlalchemy import text
 
+class NumRequestException(Exception):
+    def __init__(self, message="Max number of requests done."):
+        self.message = message
+        super().__init__(self.message)
 
 def check_requests(func):
 
@@ -79,7 +83,7 @@ def check_requests(func):
         # Else (more than 98 requests today), raise exception
         else:
             print(f" !!!!! Reached requests limit by day !!!!!")
-            raise Exception("Reached requests limit by day")
+            raise NumRequestException("Reached requests limit by day")
 
 
         print(f" = Today {updated_num_req} requests were done")
