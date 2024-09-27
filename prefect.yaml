@@ -1,6 +1,6 @@
 # Generic metadata about this project
 name: orchestration
-prefect-version: 2.19.9
+prefect-version: 2.20.3
 
 build:
 
@@ -20,7 +20,7 @@ deployments:
   description:
   entrypoint: orchestration\populate_historic_data.py:populate_teams_data
   parameters: {
-    "season": 2023
+    "season": 2022
   }
   work_pool:
     name: work-pool-2
