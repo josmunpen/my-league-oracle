@@ -82,8 +82,7 @@ def check_requests(func):
 
         # Else (more than 98 requests today), raise exception
         else:
-            print(f" !!!!! Reached requests limit by day !!!!!")
-            raise NumRequestException("Reached requests limit by day")
+            raise NumRequestException("!!!!! Reached requests limit by day !!!!!")
 
 
         print(f" = Today {updated_num_req} requests were done")
