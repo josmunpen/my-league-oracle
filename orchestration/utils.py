@@ -55,7 +55,7 @@ def check_requests(func):
                 )
                 conn.commit()
 
-        elif df["num_requests"].values[0] < 98:
+        elif df["num_requests"].values[0] < 50:
             updated_num_req = df["num_requests"].values[0] + 1
             id = df["id"].values[0]
 
