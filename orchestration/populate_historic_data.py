@@ -59,7 +59,7 @@ def populate_teams_data(season=2022):
                 try:    
                     logger.info(f"Data not found for team {team_id} and query date {query_date}")
                     team_data[query_date] = utils.get_team_info(headers=headers, team_id=team_id, season=season, query_date=query_date)
-                    time.sleep(5) #TODO: less time ?
+                    time.sleep(3) #TODO: less time ?
                 except NumRequestException as e:
                     print(e)
                     break

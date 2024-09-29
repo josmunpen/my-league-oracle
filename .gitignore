@@ -6,9 +6,7 @@ __pycache__/
 mlartifacts/
 mlruns/
 
-env_backend/
-test/
-env_dagss/
+exports/
 
 front/.web
 front/__pycache__/
@@ -16,9 +14,10 @@ front/prueba/
 front/env_front/
 front/assets/external/
 
-
-
 .env
+env_backend/
+test/
+env_dagss/
 envapi/
 env_laliga/
 env_front/
