@@ -82,5 +82,5 @@ def populate_teams_data(season=2022):
     populate_tasks.persist_teams(db, teams)
 
 
-if __name__ == "__main__":
-    populate_teams_data(season=2023)
+#if __name__ == "__main__":
+#    populate_teams_data(season=2023)
