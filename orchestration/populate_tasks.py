@@ -53,11 +53,13 @@ def persist_teams(db, teams):
                 "goals_for_away",
                 "goals_against_home",
                 "goals_against_away",
+                "season"
             ],
         )
 
-        with db.connect() as conn:
-            df_teams.to_sql(name="teams", con=conn, if_exists="append", index=False)
+        if df_teams:
+            with db.connect() as conn:
+                df_teams.to_sql(name="teams", con=conn, if_exists="append", index=False)
 
     logger.info(f"✅ Persisted {df_teams.shape[0]} teams sucessfully")
 

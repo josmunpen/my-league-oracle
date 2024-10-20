@@ -20,7 +20,7 @@ deployments:
   description:
   entrypoint: orchestration\populate_historic_data.py:populate_teams_data
   parameters: {
-    "season": 2022
+    "season": 2023
   }
   work_pool:
     name: work-pool-2

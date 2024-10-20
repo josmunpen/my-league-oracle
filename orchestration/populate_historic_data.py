@@ -10,20 +10,20 @@ import populate_tasks
 
 from utils import NumRequestException
 
+
 @task
 def get_loaded_teams(db):
     """
-    Retrieve currently loaded data. 
+    Retrieve currently loaded data.
     """
     logger = get_run_logger()
 
     with db.connect() as conn:
-        teams_db = pd.read_sql('select * from teams', conn)
+        teams_db = pd.read_sql("select * from teams", conn)
 
     logger.info("✅ Teams current data retrieved correctly from API")
 
     return teams_db
-
 
 
 @flow(log_prints=True)
@@ -33,10 +33,10 @@ def populate_teams_data(season=2022):
     logger.info("🚀 Starting flow")
 
     headers = {
-        'x-rapidapi-host': Secret.load("rapidapi-host").get(),
-        'x-rapidapi-key': Secret.load("rapidapi-key").get()
+        "x-rapidapi-host": Secret.load("rapidapi-host").get(),
+        "x-rapidapi-key": Secret.load("rapidapi-key").get(),
     }
-    
+
     db = DatabaseCredentials.load("neon-postgre-credentials").get_engine()
 
     # Get current db data
@@ -45,21 +45,31 @@ def populate_teams_data(season=2022):
     # Get all wednesdays (query dates)
     wednesdays = utils.get_all_wednesdays(season=season)
 
-    # Get all teams ids 
+    # Get all teams ids
     teams_id = populate_tasks.get_teams_ids(headers, season=season)
 
     teams = {}
     for team_id in teams_id:
         team_data = {}
         for query_date in wednesdays:
-            data_retrieved = teams_db[(teams_db["team_id"]==team_id) & (teams_db["query_date"]==query_date)]
-            #TODO: Concat everything to a single dataframe
+            data_retrieved = teams_db[
+                (teams_db["team_id"] == team_id)
+                & (teams_db["query_date"] == query_date)
+            ]
+            # TODO: Concat everything to a single dataframe
             # If data is not available at db, get it
             if data_retrieved.empty:
-                try:    
-                    logger.info(f"Data not found for team {team_id} and query date {query_date}")
-                    team_data[query_date] = utils.get_team_info(headers=headers, team_id=team_id, season=season, query_date=query_date)
-                    time.sleep(3) #TODO: less time ?
+                try:
+                    logger.info(
+                        f"Data not found for team {team_id} and query date {query_date}"
+                    )
+                    team_data[query_date] = utils.get_team_info(
+                        headers=headers,
+                        team_id=team_id,
+                        season=season,
+                        query_date=query_date,
+                    )
+                    time.sleep(3)  # TODO: less time ?
                 except NumRequestException as e:
                     print(e)
                     break
@@ -71,5 +81,6 @@ def populate_teams_data(season=2022):
     # Persist teams data
     populate_tasks.persist_teams(db, teams)
 
-# if __name__ == "__main__":
-#    populate_teams_data(season=2022)
+
+if __name__ == "__main__":
+    populate_teams_data(season=2023)
