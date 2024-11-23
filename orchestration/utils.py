@@ -142,6 +142,7 @@ def get_team_info(headers, team_id, season, query_date):
         goals_for_away,
         goals_against_home,
         goals_against_away,
+        season
     )
 
 
