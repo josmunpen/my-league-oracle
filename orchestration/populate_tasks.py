@@ -57,10 +57,11 @@ def persist_teams(db, teams):
             ],
         )
 
-        if df_teams:
+        if not df_teams.empty:
             with db.connect() as conn:
                 df_teams.to_sql(name="teams", con=conn, if_exists="append", index=False)
 
+    # TODO: Sólo apunta el numero de equipos de la ultima insercion
     logger.info(f"✅ Persisted {df_teams.shape[0]} teams sucessfully")
 
     return True
