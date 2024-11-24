@@ -68,3 +68,22 @@ deployments:
     timezone: Europe/Madrid
     day_or: true
     active: true
+
+
+- name: deploy_train
+  version: 1
+  tags: [train]
+  description: Train models and push the best one to MLFlow
+  entrypoint: orchestration\train.py:train_model
+  parameters: {
+    "seasons_to_train": [2022, 2023]
+  }
+  work_pool:
+    name: work-pool-2
+    work_queue_name:
+    job_variables: {}
+  # schedules:
+  # - cron: 0 9 * * 2 # Every Tuesday
+  #   timezone: Europe/Madrid
+  #   day_or: true
+  #   active: true
