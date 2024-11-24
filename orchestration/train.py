@@ -22,14 +22,20 @@ def train_model(seasons_to_train: List[int]):
 
     db = DatabaseCredentials.load("neon-postgre-credentials").get_engine()
 
-    mlflow_tracking_username= Secret.load("mlflow-tracking-username").get()
-
+    print("env variables before assignment")
+    print(os.environ["MLFLOW_TRACKING_USERNAME"])
+    print(os.environ["DAGSHUB_USER_TOKEN"])
+    
     os.environ["MLFLOW_TRACKING_USERNAME"] = mlflow_tracking_username
     os.environ["DAGSHUB_USER_TOKEN"] = mlflow_tracking_username
+    
+    print("env variables after assignment")
+    print(os.environ["MLFLOW_TRACKING_USERNAME"])
+    print(os.environ["DAGSHUB_USER_TOKEN"])
 
-
-    mlflow.set_tracking_uri("https://dagshub.com/josmunpen/laliga-oracle-dags.mlflow")
+    mlflow_tracking_username= Secret.load("mlflow-tracking-username").get()
     dagshub.init(repo_owner="josmunpen", repo_name="laliga-oracle-dags", mlflow=True)
+
     date_version = datetime.now().strftime("%Y-%m-%d")
     mlflow.set_experiment(f"LaLigaOracle_{date_version}")
     mlflow_client = MlflowClient(mlflow.get_tracking_uri())
