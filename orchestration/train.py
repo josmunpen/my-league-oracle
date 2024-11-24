@@ -22,9 +22,9 @@ def train_model(seasons_to_train: List[int]):
 
     db = DatabaseCredentials.load("neon-postgre-credentials").get_engine()
 
-    print("env variables before assignment")
-    print(os.environ["MLFLOW_TRACKING_USERNAME"])
-    print(os.environ["DAGSHUB_USER_TOKEN"])
+    # print("env variables before assignment")
+    # print(os.environ["MLFLOW_TRACKING_USERNAME"])
+    # print(os.environ["DAGSHUB_USER_TOKEN"])
     
     os.environ["MLFLOW_TRACKING_USERNAME"] = mlflow_tracking_username
     os.environ["DAGSHUB_USER_TOKEN"] = mlflow_tracking_username
