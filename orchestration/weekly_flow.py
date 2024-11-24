@@ -24,10 +24,10 @@ def weekly_populate_train_flow(season, run_date, seasons_to_train: List[int]):
     logger.info("🚀 Starting flow")
 
     # Execute nested flow 1: populate matches
-    populate_matches_data()
+    populate_matches_data(season=season)
 
     # Execute nested flow 2: populate teams data
-    populate_new_teams_data(season=2024, run_date="today")
+    populate_new_teams_data(season=season, run_date=run_date)
     
     # Execute nested flow 3: train models
     train_model(seasons_to_train)

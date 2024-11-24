@@ -16,7 +16,7 @@ pull:
     requirements_file: requirements_prefect.txt
 
 deployments:
-- name: deploy_populate_historic
+- name: deploy_populate_historic_teams
   version:
   tags: []
   description:
@@ -29,7 +29,7 @@ deployments:
     work_queue_name:
     job_variables: {}
 
-- name: deploy_populate_new
+- name: deploy_populate_new_teams
   version:
   tags: []
   description:
