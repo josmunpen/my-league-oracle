@@ -27,7 +27,7 @@ def get_loaded_teams(db):
 
 
 @flow(log_prints=True)
-def populate_teams_data(season=2022):
+def populate_historic_teams_data(season=2022):
     logger = get_run_logger()
 
     logger.info("🚀 Starting flow")

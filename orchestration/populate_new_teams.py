@@ -13,7 +13,7 @@ import time
 import populate_tasks
 
 from utils import NumRequestException
-
+from orchestration.train import train_model
 
 @task
 def get_loaded_teams(db, run_date):
@@ -36,7 +36,7 @@ def get_loaded_teams(db, run_date):
 
 
 @flow(log_prints=True)
-def populate_new_data(season, run_date):
+def populate_new_teams_data(season, run_date):
     logger = get_run_logger()
 
     logger.info("🚀 Starting flow")
@@ -92,7 +92,6 @@ def populate_new_data(season, run_date):
 
     # Persist teams data
     populate_tasks.persist_teams(db, teams)
-
 
 # if __name__ == "__main__":
 #    populate_new_data(season=2024, run_date="today")
