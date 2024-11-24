@@ -28,8 +28,8 @@ def train_model(seasons_to_train: List[int]):
     os.environ["DAGSHUB_USER_TOKEN"] = mlflow_tracking_username
 
 
-    dagshub.init(repo_owner="josmunpen", repo_name="laliga-oracle-dags", mlflow=True)
     mlflow.set_tracking_uri("https://dagshub.com/josmunpen/laliga-oracle-dags.mlflow")
+    dagshub.init(repo_owner="josmunpen", repo_name="laliga-oracle-dags", mlflow=True)
     date_version = datetime.now().strftime("%Y-%m-%d")
     mlflow.set_experiment(f"LaLigaOracle_{date_version}")
     mlflow_client = MlflowClient(mlflow.get_tracking_uri())

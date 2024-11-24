@@ -25,11 +25,14 @@ def weekly_populate_train_flow(season, run_date, seasons_to_train: List[int]):
 
     # Execute nested flow 1: populate matches
     populate_matches_data(season=season)
+    logger.info("1️⃣ Finished matches populate")
 
     # Execute nested flow 2: populate teams data
     populate_new_teams_data(season=season, run_date=run_date)
+    logger.info("2️⃣ Finished teams populate")
     
     # Execute nested flow 3: train models
     train_model(seasons_to_train)
+    logger.info("3️⃣ Finished models train")
 
     return True
