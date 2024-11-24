@@ -1,2 +1,0 @@
-classifier = None
-ohe = None

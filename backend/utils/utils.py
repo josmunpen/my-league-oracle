@@ -2,30 +2,35 @@ from fastapi import HTTPException
 import pandas as pd
 from datetime import datetime
 
+from backend.services.config import settings
 
-def get_team_data(team_id: int, db, request_date: datetime | None = None):
 
-    if not request_date:
-        request_date = datetime.now()
-        
+def get_team_data(
+    team_id: int,
+    db,
+    request_date: datetime = datetime.now(),
+    current_season: int = settings.current_season,
+):
     # Get teams data (filter by last data available before match date)
     df = pd.read_sql(
         f"""
-            SELECT team_id, query_date, name, history, total_played, wins_home, wins_away, draws_home, draws_away, loses_home, loses_away, goals_for_home, goals_for_away, goals_against_home, goals_against_away
+            SELECT team_id, query_date, name, history, total_played, wins_home, wins_away, draws_home,
+                    draws_away, loses_home, loses_away, goals_for_home, goals_for_away, goals_against_home,
+                    goals_against_away, season
             FROM teams
             WHERE teams.query_date = (
                 SELECT MAX(teams.query_date)
                 FROM teams
                 WHERE teams.query_date <= DATE('{request_date}')
                   AND teams.team_id = {team_id}
+                  AND teams.season <= {current_season}
             ) AND teams.team_id = {team_id}
             AND teams.history IS NOT NULL
         """,
-        con=db.bind, #TODO: Review .bind method, use session instead engine
+        con=db.bind,  # TODO: Review .bind method, use session instead engine
     )
     return df
 
-                # WHERE teams.query_date <= DATE('now')
 
 def get_match_data(team_home_id: int, team_away_id: int, db):
 
@@ -58,18 +63,28 @@ def get_match_data(team_home_id: int, team_away_id: int, db):
         how="left",
         suffixes=(None, "_index_away"),
     )
+
     df_match.drop(columns=["team_id"], axis=1, inplace=True)
 
     df_match.columns = [
         "away_" + col if ((col in df_team_away.columns) and (col != "id")) else col
         for col in df_match.columns
     ]
-    
+    if df_match["home_season"].values[0] != df_match["away_season"].values[0]:
+        raise HTTPException(
+            500,
+            "An error occurred while processing data. Data retrieved for both teams are not in the same season",
+        )
+    else:
+        df_match.rename({"home_season": "season"}, axis=1, inplace=True)
+
+    df_match.drop(columns=["away_season"], axis=1, inplace=True)
     return df_match
 
+
 def fe(df, ohe_encoder):
-    
-    #TODO: Review
+
+    # TODO: Review
     if df.shape[0] > 0:
         df = df.head(1)
 
@@ -80,15 +95,18 @@ def fe(df, ohe_encoder):
 
     # If any value is null, raise exception
     if df.isnull().any().any():
-        raise HTTPException(status_code=500,
-                            detail="Wrong data retrieved");
+        raise HTTPException(status_code=500, detail="Wrong data retrieved")
+    df.to_csv("before_ohe.csv")
 
     # OHE
-    ohe_cols = ["team_home", "team_away"]
+    ohe_cols = ["team_home", "team_away", "season"]
     try:
         ohe_encoded = ohe_encoder.transform(df[ohe_cols])
     except ValueError:
-        raise HTTPException(204, "Data not found. Please note that newly promoted teams could address some issues.")
+        raise HTTPException(
+            204,
+            "Data not found. Please note that newly promoted teams could address some issues.",
+        )
     df = pd.concat([df, ohe_encoded], axis=1).drop(columns=ohe_cols)
 
     # History feature
@@ -137,13 +155,15 @@ def fe(df, ohe_encoder):
 
     return df
 
-def get_teams_names(db):
+
+def get_teams_names(db, season):
     df = pd.read_sql(
         f"""
             SELECT team_id, name
             FROM teams
+            WHERE season = {season}
             GROUP BY team_id, name
         """,
-        con=db.bind
+        con=db.bind,
     )
     return df

@@ -11,7 +11,9 @@ pull:
     id: clone-step
     repository: https://github.com/josmunpen/my-league-oracle.git
     branch: main
-
+- prefect.deployments.steps.pip_install_requirements:
+    directory: "{{ clone-step.directory }}"
+    requirements_file: requirements_prefect.txt
 
 deployments:
 - name: deploy_populate_historic
