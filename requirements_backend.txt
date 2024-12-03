@@ -18,11 +18,12 @@ joblib==1.4.2
 markdown-it-py==3.0.0
 MarkupSafe==2.1.5
 mdurl==0.1.2
-numpy==1.26 #1.26.4
+numpy== 1.26.4 #1.26 #1.26.4
 pandas==2.2.2
 psycopg2==2.9.9 --no-binary psycopg2
 pydantic==2.8.2
 pydantic_core==2.20.1
+pydantic-settings==2.6.1
 Pygments==2.18.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
