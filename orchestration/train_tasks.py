@@ -195,7 +195,7 @@ def get_train_data(seasons_to_train, db):
 
         logger.info("✅ Teams ids retrieved correctly from DB")
 
-        return df
+    return df
 
 
 @task
