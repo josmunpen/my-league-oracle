@@ -20,7 +20,8 @@ import time
 import secrets
 from datetime import datetime
 
-def track_run(classifier, classifier_name, X, mlflow_client, log_model=True,  **kwargs):
+
+def track_run(classifier, classifier_name, X, mlflow_client, log_model=True, **kwargs):
     model_metrics = kwargs.get("model_metrics")
     model_metrics.pop("confusion_matrix")
     params = kwargs.get("params")
@@ -63,10 +64,11 @@ def track_run(classifier, classifier_name, X, mlflow_client, log_model=True,  **
                     name=classifier_name,
                     version=model_info.version,
                     key=key,
-                    value=value
+                    value=value,
                 )
 
         return mlflow.active_run().info.run_id
+
 
 def get_year_fixtures(season, db):
     available_fixtures = pd.read_sql(
@@ -95,7 +97,7 @@ def evaluate_classifier(classifier, X, y):
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=2024)
     trained_model = classifier.fit(X_train, y_train)
-    
+
     end = time.time()
 
     model_metrics = {
@@ -108,6 +110,7 @@ def evaluate_classifier(classifier, X, y):
     }
 
     return trained_model, model_metrics
+
 
 @task
 def get_train_data(seasons_to_train, db):
@@ -271,7 +274,7 @@ def preprocess_data(df):
 
     df.replace({"L": 0, "D": 1, "W": 2}, inplace=True)
 
-    #TODO: Label Encoder?
+    # TODO: Label Encoder?
     # from sklearn.preprocessing import LabelEncoder
 
     # le = LabelEncoder()
@@ -328,34 +331,32 @@ def train_models(df, dict_features, mlflow_client, scale=False):
             max_iter=10000,
         ),
         "knn_1": KNeighborsClassifier(1),
-
         "knn_3": KNeighborsClassifier(3),
-
         "knn_5": KNeighborsClassifier(5),
-
         "knn_15": KNeighborsClassifier(15),
-
         "knn_25": KNeighborsClassifier(25),
-
         "knn_50": KNeighborsClassifier(50),
         "knn_50": KNeighborsClassifier(100),
-
         "decision_tree": DecisionTreeClassifier(),
-
         "rfc_10": RandomForestClassifier(n_estimators=10),
-
         "rfc_100": RandomForestClassifier(n_estimators=100),
-
-        "rfc_1000": RandomForestClassifier(n_estimators=1000),
-
+        # "rfc_1000": RandomForestClassifier(n_estimators=1000),
         "gbr": GradientBoostingClassifier(),
-
         # (xgb.XGBClassifier(), "xgb"),
-
         # TODO: EXTREME GRADIENT BOOSTING
-        }
+    }
 
-    runs = pd.DataFrame(columns=["run_id", "accuracy", "precision", "recall", "f1", "confusion_matrix", "elapsed_time"])
+    runs = pd.DataFrame(
+        columns=[
+            "run_id",
+            "accuracy",
+            "precision",
+            "recall",
+            "f1",
+            "confusion_matrix",
+            "elapsed_time",
+        ]
+    )
 
     for name, classifier in classifiers.items():
         print(f"Training {name}")
@@ -376,51 +377,56 @@ def train_models(df, dict_features, mlflow_client, scale=False):
                 "scaled": scale,
                 "history_feature": dict_features.get("history_feature"),
             },
-            tags = {
-                "date_version": datetime.now().strftime("%Y-%m-%d")
-            }
+            tags={"date_version": datetime.now().strftime("%Y-%m-%d")},
             # figures={"confusion_matrix": cm.figure_},
         )
         row_dict = model_metrics.copy()
         row_dict["run_id"] = run_id
         runs.loc[name] = row_dict
-        
+
         print(runs)
 
         best_model_name = runs["f1"].idxmax()
         best_model_run_id = runs.loc[runs["f1"].idxmax(), "run_id"]
     return best_model_name, best_model_run_id
-    
 
 
 @task
-def promote_best_model(mlflow_client, best_model_run_id, ohe_encoder):
+def promote_best_model(best_model_name, best_model_run_id, seasons_to_train, ohe_encoder, mlflow_client):
 
-        best_model = mlflow_client.search_model_versions(f"run_id='{best_model_run_id}'")[0]
+    # Retrieve model
+    best_model = mlflow_client.search_model_versions(f"run_id='{best_model_run_id}'")[0]
 
-        mlflow_client.set_model_version_tag(
-            name=best_model.name,
-            version=best_model.version,
-            key="weekly_best",
-            value=True
-        )
+    # Set tags
+    mlflow_client.set_model_version_tag(
+        name=best_model.name, version=best_model.version, key="weekly_best", value=True
+    )
 
-        mlflow_client.copy_model_version(
-            src_model_uri=f"models:/{best_model.name}/{best_model.version}",
-            dst_name="oracle-model-production",
-        )
+    mlflow_client.set_model_version_tag(
+        name=best_model.name, version=best_model.version, key="model_name", value=best_model_name
+    )
 
-        mlflow.sklearn.log_model(
-            sk_model=ohe_encoder,
-            artifact_path="ohe_encoder",
-            registered_model_name="ohe_encoder",
-        )
+    mlflow_client.set_model_version_tag(
+        name=best_model.name, version=best_model.version, key="train_seasons", value=seasons_to_train
+    )
 
-        ohe_info = mlflow_client.get_latest_versions("ohe_encoder")[0]
+    # Promote prediction model and ohe encoder
+    mlflow_client.copy_model_version(
+        src_model_uri=f"models:/{best_model.name}/{best_model.version}",
+        dst_name="oracle-model-production",
+    )
 
-        mlflow_client.copy_model_version(
-            src_model_uri=f"models:/ohe_encoder/{ohe_info.version}",
-            dst_name="oracle-ohe-production",
-        )
-        
-        return True
+    mlflow.sklearn.log_model(
+        sk_model=ohe_encoder,
+        artifact_path="ohe_encoder",
+        registered_model_name="ohe_encoder",
+    )
+
+    ohe_info = mlflow_client.get_latest_versions("ohe_encoder")[0]
+
+    mlflow_client.copy_model_version(
+        src_model_uri=f"models:/ohe_encoder/{ohe_info.version}",
+        dst_name="oracle-ohe-production",
+    )
+
+    return True
