@@ -87,7 +87,6 @@ def fe(df, ohe_encoder):
     # TODO: Review
     if df.shape[0] > 0:
         df = df.head(1)
-
     # Drop columns
     df = df.drop(
         columns=["home_query_date", "away_query_date", "home_name", "away_name"], axis=1
@@ -103,6 +102,7 @@ def fe(df, ohe_encoder):
     try:
         ohe_encoded = ohe_encoder.transform(df[ohe_cols])
     except ValueError:
+        print("OHE issue")
         raise HTTPException(
             204,
             "Data not found. Please note that newly promoted teams could address some issues.",

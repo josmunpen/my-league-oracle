@@ -1,10 +1,10 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 
-from . import db_models
-from .db import engine
-from .routers import model_manager, teams, predictions
-from .dependencies import get_db
+from backend import db_models
+from backend.db import engine
+from backend.routers import model_manager, teams, predictions
+from backend.dependencies import get_db
 
 db_models.Base.metadata.create_all(bind=engine)
 
