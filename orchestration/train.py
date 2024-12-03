@@ -14,6 +14,10 @@ import dagshub
 
 from datetime import datetime
 
+import requests
+import json
+
+
 @flow(log_prints=True)
 def train_model(seasons_to_train: List[int]):
     logger = get_run_logger()
@@ -21,18 +25,11 @@ def train_model(seasons_to_train: List[int]):
     logger.info("🚀 Starting flow")
 
     db = DatabaseCredentials.load("neon-postgre-credentials").get_engine()
-    mlflow_tracking_username= Secret.load("mlflow-tracking-username").get()
+    mlflow_tracking_username = Secret.load("mlflow-tracking-username").get()
+    url_backend = Secret.load("url-backend").get()
 
-    # print("env variables before assignment")
-    # print(os.environ["MLFLOW_TRACKING_USERNAME"])
-    # print(os.environ["DAGSHUB_USER_TOKEN"])
-    
     os.environ["MLFLOW_TRACKING_USERNAME"] = mlflow_tracking_username
     os.environ["DAGSHUB_USER_TOKEN"] = mlflow_tracking_username
-    
-    print("env variables after assignment")
-    print(os.environ["MLFLOW_TRACKING_USERNAME"])
-    print(os.environ["DAGSHUB_USER_TOKEN"])
 
     dagshub.auth.add_app_token(token=mlflow_tracking_username)
     mlflow.set_tracking_uri("https://dagshub.com/josmunpen/laliga-oracle-dags.mlflow")
@@ -47,7 +44,9 @@ def train_model(seasons_to_train: List[int]):
     logger.info("✅ Retrieved data succesfully")
 
     # 2. Preprocessing and Feature Engineering
-    preprocessed_data, ohe_encoder, dict_features = train_tasks.preprocess_data(train_data)
+    preprocessed_data, ohe_encoder, dict_features = train_tasks.preprocess_data(
+        train_data
+    )
     logger.info("✅ Preprocessed data succesfully")
 
     # 3. Train
@@ -56,12 +55,23 @@ def train_model(seasons_to_train: List[int]):
         dict_features=dict_features,
         mlflow_client=mlflow_client,
         scale=False,
-    )   
+    )
     logger.info("✅ Trained models succesfully")
-    
+
     # 4. Promote best model to PRO
-    success: bool = train_tasks.promote_best_model(mlflow_client, best_model_run_id, ohe_encoder)
+    success: bool = train_tasks.promote_best_model(
+        best_model_name = best_model,
+        best_model_run_id = best_model_run_id,
+        seasons_to_train = seasons_to_train,
+        ohe_encoder = ohe_encoder,
+        mlflow_client = mlflow_client,
+    )
     logger.info("✅ Promoted model + OHE succesfully")
+
+    # 5. Update backend model
+    updated = requests.get(url=url_backend + "/models/")
+    res = json.loads(updated.text) 
+    logger.info(res.get("msg"))
 
     return success
 
