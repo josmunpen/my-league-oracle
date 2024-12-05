@@ -104,6 +104,11 @@ class State(rx.State):
     ## Prediction formatted
     prediction_winner_format: str = None
     prediction_probs_format: list = []
+    ## Prediction model info
+    prediction_model_name: str = None
+    prediction_model_train_seasons: list = []
+    prediction_model_train_ts: str = None
+    prediction_model_info: str = None
 
     ## Teams ids
     team_home_id: str = None
@@ -111,6 +116,8 @@ class State(rx.State):
 
     ## Show when prediction is done
     show_prediction: bool = False
+
+    screen_msg: str = ""
 
     def format_prediction(self, prediction) -> str:
         '''
@@ -143,17 +150,28 @@ class State(rx.State):
         url = f"{backend_url}/predictions/?team_home_id={self.team_home_id}&team_away_id={self.team_away_id}"
 
         response = httpx.get(url)
-
         res_prediction = json.loads(response.text)
-
+        
+        if response.status_code != 200:
+            self.screen_msg = res_prediction["detail"]
+            self.show_prediction = False
+            return
+        
         self.prediction = res_prediction
 
         self.prediction_winner_format = self.format_prediction(res_prediction["result_prediction"])
-    
         self.prediction_probs_format = [
                 {"name": "Win home", "prob": res_prediction["probs"]["home_win"]},
                 {"name": "Draw", "prob": res_prediction["probs"]["draw"]},
                 {"name": "Win away", "prob": res_prediction["probs"]["away_win"]}
             ]
+        
+
+        self.prediction_model_name = res_prediction["model"].get("name")
+        self.prediction_model_train_seasons = res_prediction["model"].get("train_seasons")
+        self.prediction_model_train_ts = res_prediction["model"].get("train_ts")
+
+        self.prediction_model_info = f"(Model employed was {self.prediction_model_name}, trained on {self.prediction_model_train_ts} with data from seasons {self.prediction_model_train_seasons})"
+
         self.show_prediction = True
-    
+        self.screen_msg = ""

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 import numpy as np
 
@@ -19,6 +19,9 @@ def predict_match(
     """
     Predict a fixture result.
     """
+    if team_home_id == team_away_id:
+        raise HTTPException(400, "Selected teams must be different")
+
     df_match = utils.get_match_data(team_home_id, team_away_id, db)
     df_match = utils.fe(df_match, model.get_ohe())
 
@@ -26,7 +29,7 @@ def predict_match(
 
     classifier_name = model_info.get("classifier_name")
     train_seasons = model_info.get("train_seasons")
-    train_seasons = model_info.get("train_seasons")
+    train_ts = model_info.get("train_ts")
     classifier = model_info.get("classifier")
 
     result_predict = classifier.predict(df_match.values)[0]
@@ -38,6 +41,7 @@ def predict_match(
         "probs": {"home_win": probs[0], "draw": probs[1], "away_win": probs[2]},
         "model": {
             "name": classifier_name,
-            "train_seasons": train_seasons
+            "train_seasons": train_seasons,
+            "train_ts": train_ts
         }
     }
