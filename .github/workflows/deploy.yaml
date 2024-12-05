@@ -17,3 +17,4 @@ jobs:
           app_directory: "front"
           extra_args: "--env BACKEND_URL=${{ secrets.BACKEND_URL }}" # Optional
           # python_version: "3.12" # Optional
+          dry_run: "false"
