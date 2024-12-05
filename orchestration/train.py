@@ -42,7 +42,6 @@ def train_model(seasons_to_train: List[int]):
     # 1. Read data
     train_data = train_tasks.get_train_data(seasons_to_train, date_version, db)
     logger.info("✅ Retrieved data succesfully")
-    train_data.to_csv("train_data.csv")
 
     # 2. Preprocessing and Feature Engineering
     preprocessed_data, ohe_encoder, dict_features = train_tasks.preprocess_data(

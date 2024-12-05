@@ -95,7 +95,6 @@ def fe(df, ohe_encoder):
     # If any value is null, raise exception
     if df.isnull().any().any():
         raise HTTPException(status_code=500, detail="Wrong data retrieved")
-    df.to_csv("before_ohe.csv")
 
     # OHE
     ohe_cols = ["team_home", "team_away", "season"]
