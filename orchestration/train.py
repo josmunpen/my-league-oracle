@@ -24,24 +24,26 @@ def train_model(seasons_to_train: List[int]):
 
     logger.info("🚀 Starting flow")
 
+    # Get environment variables
     db = DatabaseCredentials.load("neon-postgre-credentials").get_engine()
     mlflow_tracking_username = Secret.load("mlflow-tracking-username").get()
     url_backend = Secret.load("url-backend").get()
-
     os.environ["MLFLOW_TRACKING_USERNAME"] = mlflow_tracking_username
     os.environ["DAGSHUB_USER_TOKEN"] = mlflow_tracking_username
 
+    # Set MLFlow config
     dagshub.auth.add_app_token(token=mlflow_tracking_username)
     mlflow.set_tracking_uri("https://dagshub.com/josmunpen/laliga-oracle-dags.mlflow")
     dagshub.init(repo_owner="josmunpen", repo_name="laliga-oracle-dags", mlflow=True)
-
     date_version = datetime.now().strftime("%Y-%m-%d")
     mlflow.set_experiment(f"LaLigaOracle_{date_version}")
     mlflow_client = MlflowClient(mlflow.get_tracking_uri())
 
-    # 1. Leer dato
-    train_data = train_tasks.get_train_data(seasons_to_train, db)
+    # 1. Read data
+    train_data = train_tasks.get_train_data(seasons_to_train, date_version, db)
     logger.info("✅ Retrieved data succesfully")
+    train_data.to_csv("train_data.csv")
+
     # 2. Preprocessing and Feature Engineering
     preprocessed_data, ohe_encoder, dict_features = train_tasks.preprocess_data(
         train_data
@@ -75,5 +77,5 @@ def train_model(seasons_to_train: List[int]):
     return success
 
 
-# if __name__ == "__main__":
-#     train_model(seasons_to_train=[2022, 2023])
+if __name__ == "__main__":
+    train_model(seasons_to_train=[2022, 2023, 2024])

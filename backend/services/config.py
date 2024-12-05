@@ -1,8 +1,9 @@
 from pydantic_settings import BaseSettings
 
+
 class Settings(BaseSettings):
     app_name: str = "My League Oracle"
-    current_season: int = 2023
+    current_season: int = 2024
     teams_2022: list = [
         "548",
         "728",
@@ -45,5 +46,28 @@ class Settings(BaseSettings):
         "538",
         "531",
     ]
+    teams_2024: list = [
+        "548",
+        "541",
+        "728",
+        "546",
+        "534",
+        "547",
+        "727",
+        "530",
+        "533",
+        "543",
+        "536",
+        "542",
+        "720",
+        "529",
+        "537",
+        "798",
+        "532",
+        "540",
+        "531",
+        "538",
+    ]
+
 
 settings = Settings()

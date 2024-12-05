@@ -12,7 +12,7 @@ def refresh_model(version: str | None = None, model=ResultsModel()):
     try:
         if not version:
             version = "latest"
-        model.update_model()
+        model.initialize_model()
         updated_model = model.get_model()
         model_name = updated_model["classifier_name"]
         model_train_season = updated_model["train_ts"]

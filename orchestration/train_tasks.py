@@ -70,12 +70,14 @@ def track_run(classifier, classifier_name, X, mlflow_client, log_model=True, **k
         return mlflow.active_run().info.run_id
 
 
-def get_year_fixtures(season, db):
+def get_year_fixtures(season, db, date_version):
     available_fixtures = pd.read_sql(
         f"""
                             SELECT DISTINCT(fixture)
                             FROM matches
                             WHERE season={season}
+                                    AND match_date < '{date_version}'
+                                    AND result_real IS NOT NULL
                             """,
         con=db,
     )
@@ -113,7 +115,7 @@ def evaluate_classifier(classifier, X, y):
 
 
 @task
-def get_train_data(seasons_to_train, db):
+def get_train_data(seasons_to_train, date_version, db):
     """
     Get historic data from PostgreSQL.
     """
@@ -121,7 +123,9 @@ def get_train_data(seasons_to_train, db):
 
     dfs = []
     for season in seasons_to_train:
-        available_fixtures = get_year_fixtures(season, db)
+        available_fixtures = get_year_fixtures(
+            season=season, date_version=date_version, db=db
+        )
         for fixture in available_fixtures:  # Get fixture matches data
             df_matches = pd.read_sql(
                 f"""
@@ -129,6 +133,8 @@ def get_train_data(seasons_to_train, db):
                                         FROM matches
                                         WHERE fixture={fixture} 
                                             AND season={season}
+                                            AND match_date < '{date_version}'
+                                            AND result_real IS NOT NULL
                                         """,
                 con=db,
             )
@@ -190,7 +196,7 @@ def get_train_data(seasons_to_train, db):
         ]
 
         df["match_date"] = pd.to_datetime(df["match_date"])
-
+        df.to_csv("df_pre.csv")
         # with db.connect() as conn:
 
         logger.info("✅ Teams ids retrieved correctly from DB")
@@ -317,6 +323,8 @@ def train_models(df, dict_features, mlflow_client, scale=False):
     # Split by target variable
     target_variable = "result_real"
 
+    df.to_csv("df.csv")
+
     X, y = df.loc[:, df.columns != target_variable], df[target_variable]
 
     # Scale
@@ -384,15 +392,18 @@ def train_models(df, dict_features, mlflow_client, scale=False):
         row_dict["run_id"] = run_id
         runs.loc[name] = row_dict
 
-        print(runs)
+    best_model_name = runs["f1"].idxmax()
+    best_model_run_id = runs.loc[runs["f1"].idxmax(), "run_id"]
 
-        best_model_name = runs["f1"].idxmax()
-        best_model_run_id = runs.loc[runs["f1"].idxmax(), "run_id"]
+    print(runs)
+    print(f"Best model: {best_model_name}")
     return best_model_name, best_model_run_id
 
 
 @task
-def promote_best_model(best_model_name, best_model_run_id, seasons_to_train, ohe_encoder, mlflow_client):
+def promote_best_model(
+    best_model_name, best_model_run_id, seasons_to_train, ohe_encoder, mlflow_client
+):
 
     # Retrieve model
     best_model = mlflow_client.search_model_versions(f"run_id='{best_model_run_id}'")[0]
@@ -403,11 +414,17 @@ def promote_best_model(best_model_name, best_model_run_id, seasons_to_train, ohe
     )
 
     mlflow_client.set_model_version_tag(
-        name=best_model.name, version=best_model.version, key="model_name", value=best_model_name
+        name=best_model.name,
+        version=best_model.version,
+        key="model_name",
+        value=best_model_name,
     )
 
     mlflow_client.set_model_version_tag(
-        name=best_model.name, version=best_model.version, key="train_seasons", value=seasons_to_train
+        name=best_model.name,
+        version=best_model.version,
+        key="train_seasons",
+        value=seasons_to_train,
     )
 
     # Promote prediction model and ohe encoder
