@@ -12,8 +12,8 @@ jobs:
       - name: Deploy to Reflex Cloud
         uses: reflex-dev/reflex-deploy-action@v0
         with:
-          auth_token: ${\{ secrets.REFLEX_AUTH_TOKEN }}
-          project_id: ${\{ secrets.REFLEX_PROJECT_ID }}
+          auth_token: ${{ secrets.REFLEX_AUTH_TOKEN }}
+          project_id: ${{ secrets.REFLEX_PROJECT_ID }}
           app_directory: "front"
           extra_args: "--env BACKEND_URL=${{ secrets.BACKEND_URL }}" # Optional
           # python_version: "3.12" # Optional
