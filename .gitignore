@@ -13,6 +13,7 @@ front/__pycache__/
 front/prueba/
 front/env_front/
 front/assets/external/
+front/.env
 
 .env
 env_backend/
@@ -21,6 +22,7 @@ env_dagss/
 envapi/
 env_laliga/
 env_front/
+env_front2/
 env_back/
 env_orch/
 env_orch2/

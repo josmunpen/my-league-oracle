@@ -21,19 +21,22 @@ class State(rx.State):
 
     ## Team names
     team_names: list[str] = []
+    team_ids: list[int] = []
 
     ## Form with team id
     form_team_details: dict = {}
 
     ## Team details (data)
     team_details: pd.DataFrame = pd.DataFrame()
-    team_details2: dict = {}
+    team_details2: list = []
+    map_team_id: dict = {}
 
     def load_data_teams(self):
         '''
         Load teams names and ids
         '''
         print("Loading data...")
+        
         url = f"{backend_url}/teams/"
         response = httpx.get(url)
         df = pd.DataFrame.from_records(json.loads(response.text))
@@ -106,13 +109,13 @@ class State(rx.State):
     prediction_probs_format: list = []
     ## Prediction model info
     prediction_model_name: str = None
-    prediction_model_train_seasons: list = []
+    prediction_model_train_seasons: str = None
     prediction_model_train_ts: str = None
     prediction_model_info: str = None
 
     ## Teams ids
-    team_home_id: str = None
-    team_away_id: str = None
+    team_home_id: int = None
+    team_away_id: int = None
 
     ## Show when prediction is done
     show_prediction: bool = False

@@ -196,7 +196,6 @@ def get_train_data(seasons_to_train, date_version, db):
         ]
 
         df["match_date"] = pd.to_datetime(df["match_date"])
-        df.to_csv("df_pre.csv")
         # with db.connect() as conn:
 
         logger.info("✅ Teams ids retrieved correctly from DB")
@@ -322,8 +321,6 @@ def preprocess_data(df):
 def train_models(df, dict_features, mlflow_client, scale=False):
     # Split by target variable
     target_variable = "result_real"
-
-    df.to_csv("df.csv")
 
     X, y = df.loc[:, df.columns != target_variable], df[target_variable]
 
