@@ -27,14 +27,15 @@ Below you can see a kind of architecture diagram that summarizes the deployed sy
 4. User (frontend) sends requests about matches by selecting two teams, backend answers with predicted results.
 
 ## CI / CD
-- [ ] 🚧WIP. ETLs (Prefect). 
-- [ ] 🚧WIP. Frontend (Reflex)
-- [x] Backend (Koyeb)
-- [x] ML Models 
+- ✅ Backend (Koyeb). Backend CI is made with koyeb utilities. A dockerfile is on the root of this repo and everytime a commit is done to main, it builds a new image and deploys it. Files listed in .koyebignore file don't trigger this build.
+- ✅ ML Models (MLFlow / FastAPI). ETLs log all models to MLFlow. The best one is promoted to an specific Production model
+- 🚧WIP. ETLs (Prefect Cloud).
+- 🚧WIP. Frontend (Reflex Cloud)
+
 
 ## Folders structure
-* backend/. FastAPI microservice. Exposes API to load model, read data and make predictions.
-* frontend/. Reflex frontend. Sends prediction requests to backend API.
+- backend/. FastAPI microservice. Exposes API to load model, read data and make predictions.
+- frontend/. Reflex frontend. Sends prediction requests to backend API.
 - notebooks/. Notebooks used during development time.
 - orchestration/. Prefect code for ETLs.
 - .gitignore
