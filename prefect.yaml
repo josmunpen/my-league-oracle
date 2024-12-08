@@ -80,12 +80,12 @@ deployments:
   #   active: true
 
 - name: deploy_weekly_flow
-  version: 1
+  version: 2
   tags: [populate, train]
-  description: Weekly flow that invokes populate new data flow and train models flow
+  description: Weekly flow that invokes populate new data flow and train models flow.
   entrypoint: orchestration\weekly_flow.py:weekly_populate_train_flow
   parameters: {
-    "seasons_to_train": [2022, 2023],
+    "seasons_to_train": [2022, 2023, 2024],
     "season": 2024,
     "run_date": "today"
   }
